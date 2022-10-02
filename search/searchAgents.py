@@ -34,6 +34,7 @@ description for details.
 Good luck and happy searching!
 """
 
+from pprint import pprint
 from game import Directions
 from game import Agent
 from game import Actions
@@ -288,21 +289,27 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-
+        self.corners = ((1,1), (1,top),  (right, top), (right, 1))
+        self.startState = (self.startingPosition, [1, 1, 1, 1])
+        
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        return self.startState
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return state[1] == [0, 0, 0, 0]
+    
+    def calcCost(self, state):
+        pass
 
     def getSuccessors(self, state):
         """
@@ -314,7 +321,7 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
+        
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
@@ -323,8 +330,19 @@ class CornersProblem(search.SearchProblem):
             #   dx, dy = Actions.directionToVector(action)
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
-
             "*** YOUR CODE HERE ***"
+            (x,y), corners = state
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                _corners = corners.copy()
+                for corner in self.corners:
+                    if corner == (nextx, nexty):
+                        _corners[self.corners.index(corner)] = 0
+                        break
+                nextState = ((nextx, nexty), _corners)
+                cost = 1
+                successors.append( ( nextState, action, cost) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,7 +378,48 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # The sum of manhattan distance to other 4 corners
+    def pathHeuristic(state, corners):
+        ret = 0
+        cur_state = state
+        min_cost = 999999
+        def test_clock(cur_state, start_corner, corners, wise):
+            cost = 0
+            cost += util.manhattanDistance(cur_state[0], start_corner)
+            corner_id = corners.index(start_corner) 
+            corner = start_corner
+            for i in range(4):
+                if not wise:
+                    corner_id = (corner_id + 1) % 4
+                else:
+                    corner_id = (corner_id - 1) % 4
+                if start_corner == corners[corner_id]:
+                    break
+                if state[1][corner_id] == 1:
+                    cost += util.manhattanDistance(corner, corners[corner_id])
+                    corner = corners[corner_id]
+            return cost
+
+        min_cost = 999999    
+        for corner in corners:
+            if state[1][corners.index(corner)] == 1:
+                start_corner = corner
+                cost_clock = test_clock(cur_state, start_corner, corners, 0)
+                cost_wise = test_clock(cur_state, start_corner, corners, 1)
+                min_cost = min(min_cost, cost_clock, cost_wise)
+
+        if min_cost == 999999:
+            return 0
+        return min_cost
+        
+    def distHeuristic(state, corners):
+        ret = 0
+        for corner in corners:
+            if state[1][corners.index(corner)] == 1:
+                ret += util.manhattanDistance(corner, state[0])
+        return ret
+    
+    return pathHeuristic(state, corners)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"

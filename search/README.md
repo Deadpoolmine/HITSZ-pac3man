@@ -185,9 +185,9 @@ Implement the uniform-cost graph search algorithm in the `uniformCostSearch` fun
 
 `python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs`
 
-`python pacman.py -l mediumDottedMaze -p StayEastSearchAgent`
+`python pacman.py -l mediumDottedMaze -p StayEastSearchAgent --frameTime 0`
 
-`python pacman.py -l mediumScaryMaze -p StayWestSearchAgent`
+`python pacman.py -l mediumScaryMaze -p StayWestSearchAgent --frameTime 0`
 
 _Note:_ You should get very low and very high path costs for the `StayEastSearchAgent` and `StayWestSearchAgent` respectively, due to their exponential cost functions (see `searchAgents.py` for details).
 
@@ -199,7 +199,7 @@ Implement A\* graph search in the empty function `aStarSearch` in `search.py`. A
 
 You can test your A\* implementation on the original problem of finding a path through a maze to a fixed position using the Manhattan distance heuristic (implemented already as `manhattanHeuristic` in `searchAgents.py`).
 
-`python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic`
+`python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic --frameTime 0`
 
 You should see that A\* finds the optimal solution slightly faster than uniform cost search (about 549 vs. 620 search nodes expanded in our implementation, but ties in priority may make your numbers differ slightly). What happens on `openMaze` for the various search strategies?
 
@@ -231,7 +231,7 @@ Our implementation of `breadthFirstSearch` expands just under 2000 search nodes 
 
 _Note: Make sure to complete Question 4 before working on Question 6, because Question 6 builds upon your answer for Question 4._
 
-Implement a non-trivial, consistent heuristic for the `CornersProblem` in `cornersHeuristic`.
+Implement a **non-trivial, consistent** heuristic for the `CornersProblem` in `cornersHeuristic`.
 
 `python pacman.py -l mediumCorners -p AStarCornersAgent -z 0.5`
 
@@ -276,7 +276,7 @@ Fill in `foodHeuristic` in `searchAgents.py` with a consistent heuristic for the
 
 `python pacman.py -l trickySearch -p AStarFoodSearchAgent`
 
-Our UCS agent finds the optimal solution in about 13 seconds, exploring over 16,000 nodes.
+Our UCS agent finds the optimal solution in about 13 seconds, exploring over 16,000 nodes.a
 
 Any non-trivial non-negative consistent heuristic will receive 1 point. Make sure that your heuristic returns 0 at every goal state and never returns a negative value. Depending on how few nodes your heuristic expands, you'll get additional points:
 

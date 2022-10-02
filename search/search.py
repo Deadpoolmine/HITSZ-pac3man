@@ -17,6 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from time import sleep
 import util
 
 class SearchProblem:
@@ -87,17 +88,85 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    from game import Directions
+    fringe = util.Stack()
+    explored = []
+    fringe.push(((problem.getStartState(), Directions.STOP, 1), None))
+    while not fringe.isEmpty():
+        node = fringe.pop()
+        state = node[0][0]
+        if problem.isGoalState(state):
+            break
+        
+        if state not in explored:
+            # expanding
+            for successor in problem.getSuccessors(state):
+                fringe.push((successor, node))
+
+            explored.append(state)
+
+    path = []
+    while node[0][0] != problem.getStartState():
+        path.append(node[0])
+        node = node[1]
+    path.reverse()
+
+    return [x[1] for x in path]
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # print("Start:", problem.getStartState())
+    from game import Directions
+    fringe = util.Queue()
+    explored = []
+    fringe.push(((problem.getStartState(), Directions.STOP, 1), None))
+    while not fringe.isEmpty():
+        node = fringe.pop()
+        state = node[0][0]
+        if problem.isGoalState(state):
+            break
+        # expanding
+        if state not in explored:
+            for successor in problem.getSuccessors(state):
+                fringe.push((successor, node))
+            explored.append(state)
+
+    path = []
+    while node[0][0] != problem.getStartState():
+        path.append(node[0])
+        node = node[1]
+    path.reverse()
+
+    return [x[1] for x in path]
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+    # lowest heap implemented as priority queue
+    fringe = util.PriorityQueue()
+    explored = []
+    fringe.push(((problem.getStartState(), Directions.STOP, 1), None), 0)
+    while not fringe.isEmpty():
+        node = fringe.pop()
+        state = node[0][0]
+        if problem.isGoalState(state):
+            break
+        # expanding
+        if state not in explored:
+            for successor in problem.getSuccessors(state):
+                fringe.push((successor, node), getCostOfCurrentState(problem, (successor, node))+ successor[2])
+            explored.append(state)
+
+    path = []
+    while node[0][0] != problem.getStartState():
+        path.append(node[0])
+        node = node[1]
+    path.reverse()
+
+    return [x[1] for x in path]
 
 def nullHeuristic(state, problem=None):
     """
@@ -106,10 +175,41 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+def getCostOfCurrentState(problem, node):
+    path = []
+    while node[0][0] != problem.getStartState():
+        path.append(node[0])
+        node = node[1]
+    path.reverse()
+    return problem.getCostOfActions([x[1] for x in path])
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    from game import Directions
+    # lowest heap implemented as priority queue
+    fringe = util.PriorityQueue()
+    explored = []
+    fringe.push(((problem.getStartState(), Directions.STOP, 1), None), 0)
+    while not fringe.isEmpty():
+        node = fringe.pop()
+        state = node[0][0]
+        if problem.isGoalState(state):
+            break
+        if state not in explored:
+            for successor in problem.getSuccessors(state):
+                f = getCostOfCurrentState(problem, (successor, node)) + heuristic(successor[0], problem)
+                fringe.push((successor, node), f)
+            explored.append(state)
+
+    path = []
+    while node[0][0] != problem.getStartState():
+        path.append(node[0])
+        node = node[1]
+    path.reverse()
+
+    return [x[1] for x in path]
 
 
 # Abbreviations
